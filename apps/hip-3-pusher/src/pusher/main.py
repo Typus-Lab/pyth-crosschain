@@ -1,24 +1,27 @@
 import argparse
 import asyncio
-from loguru import logger
 import os
 import sys
 import tomllib
 
+from loguru import logger
+
 from pusher.config import Config
+from pusher.hermes_listener import HermesListener
 from pusher.hyperliquid_listener import HyperliquidListener
 from pusher.lazer_listener import LazerListener
-from pusher.hermes_listener import HermesListener
-from pusher.seda_listener import SedaListener
+from pusher.metrics import Metrics
 from pusher.price_state import PriceState
 from pusher.publisher import Publisher
-from pusher.metrics import Metrics
+from pusher.seda_listener import SedaListener
+from pusher.user_limit_listener import UserLimitListener
 
 
-def load_config():
+def load_config() -> Config:
     parser = argparse.ArgumentParser(description="hip3-agent command-line arguments")
     parser.add_argument(
-        "-c", "--config",
+        "-c",
+        "--config",
         required=True,
         help="hip3-agent config file",
     )
@@ -27,29 +30,47 @@ def load_config():
         config_toml = tomllib.load(config_file)
         config = Config(**config_toml)
         logger.debug("Config loaded: {}", config)
+        logger.info("Price config: {}", config.price)
     return config
 
 
-def init_logging():
+def init_logging() -> None:
     logger.remove()
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     # serialize=True if we want json logging
     logger.add(sys.stderr, level=log_level, serialize=False)
 
 
-async def main():
+async def main() -> None:
     init_logging()
     logger.info("Starting hip-3-pusher...")
     config = load_config()
 
     price_state = PriceState(config)
     metrics = Metrics(config)
+    metrics.set_price_configs(config.hyperliquid.market_name, config.price)
 
     publisher = Publisher(config, price_state, metrics)
-    hyperliquid_listener = HyperliquidListener(config, price_state.hl_oracle_state, price_state.hl_mark_state, price_state.hl_mid_state)
+    hyperliquid_listener = HyperliquidListener(
+        config,
+        price_state.hl_oracle_state,
+        price_state.hl_mark_state,
+        price_state.hl_mid_state,
+    )
     lazer_listener = LazerListener(config, price_state.lazer_state)
     hermes_listener = HermesListener(config, price_state.hermes_state)
-    seda_listener = SedaListener(config, price_state.seda_state)
+    seda_listener = SedaListener(
+        config,
+        price_state.seda_state,
+        price_state.seda_last_state,
+        price_state.seda_ema_state,
+        price_state.seda_oracle_state,
+        price_state.seda_mark_state,
+        price_state.seda_external_state,
+    )
+    user_limit_listener = UserLimitListener(
+        config, metrics, publisher.user_limit_address
+    )
 
     await asyncio.gather(
         publisher.run(),
@@ -57,6 +78,7 @@ async def main():
         lazer_listener.subscribe_all(),
         hermes_listener.subscribe_all(),
         seda_listener.run(),
+        user_limit_listener.run(),
     )
     logger.info("Exiting hip-3-pusher..")
 

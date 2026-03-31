@@ -2,11 +2,10 @@
 /* eslint-disable @typescript-eslint/no-deprecated */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Program } from '@coral-xyz/anchor'
 import { Dialog, Menu, Transition } from '@headlessui/react'
-import Arrow from '@images/icons/down.inline.svg'
 import type { PythOracle } from '@pythnetwork/client/lib/anchor'
 import {
   createDetermisticPriceStoreInitializePublisherInstruction,
@@ -27,9 +26,10 @@ import toast from 'react-hot-toast'
 import { ClusterContext } from '../contexts/ClusterContext'
 import { usePythContext } from '../contexts/PythContext'
 import type { ProductRawConfig } from '../hooks/usePyth'
-import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
 import Spinner from './common/Spinner'
 import CloseIcon from './icons/CloseIcon'
+import Arrow from '../images/icons/down.inline.svg'
+import { capitalizeFirstLetter } from '../utils/capitalizeFirstLetter'
 
 const assetTypes = [
   'All',
@@ -64,7 +64,6 @@ const PermissionDepermissionKey = ({
 
   // get current input value
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (event: any) => {
     setSelectedAssetType(event.target.value)
     setIsModalOpen(true)
@@ -142,7 +141,6 @@ const PermissionDepermissionKey = ({
         toast.success(`Proposal sent! 🚀 Proposal Pubkey: ${proposalPubkey}`)
         setIsSubmitButtonLoading(false)
         closeModal()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         if (error.response) {
           toast.error(capitalizeFirstLetter(error.response.data))

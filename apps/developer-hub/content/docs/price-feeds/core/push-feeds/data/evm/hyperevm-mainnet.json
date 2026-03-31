@@ -50,6 +50,13 @@
       "confidence_ratio": 100
     },
     {
+      "alias": "USH/USD",
+      "id": "eaa30c1ef2d9f4fde45d6e699bfda5187b3de200ea4cbab25d676b260ab728c1",
+      "time_difference": 3600,
+      "price_deviation": 1,
+      "confidence_ratio": 100
+    },
+    {
       "alias": "WBTC/USD",
       "id": "c9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33",
       "time_difference": 3600,
@@ -183,13 +190,6 @@
       "confidence_ratio": 100
     },
     {
-      "alias": "BUDDY/USD",
-      "id": "ac2adf4571a391da22a2d39e8c5eb32ceecd6ab38c386a9194d669deece74dee",
-      "time_difference": 3600,
-      "price_deviation": 1,
-      "confidence_ratio": 100
-    },
-    {
       "alias": "XAU/USD",
       "id": "765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2",
       "time_difference": 3600,
@@ -206,13 +206,6 @@
     {
       "alias": "UFART/USD",
       "id": "a210f55ff119d315002b5dc4f763b4e4114197028e45d6aca16498ab1433fb6d",
-      "time_difference": 3600,
-      "price_deviation": 1,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "USH/USD",
-      "id": "eaa30c1ef2d9f4fde45d6e699bfda5187b3de200ea4cbab25d676b260ab728c1",
       "time_difference": 3600,
       "price_deviation": 1,
       "confidence_ratio": 100
@@ -290,6 +283,27 @@
     {
       "alias": "USDH/USD",
       "id": "f364e785775b4cb2f159ea823f8b5b9b669a4c221a3f845e518ba0e09611c553",
+      "time_difference": 3600,
+      "price_deviation": 1,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "USDT0/USD",
+      "id": "cfc1303ea9f083b1b4f99e1369fb9d2611f3230d5ea33a6abf2f86071c089fdc",
+      "time_difference": 3600,
+      "price_deviation": 1,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "USDN/USD",
+      "id": "ee8e0a7de474035b5cbc1a5f762a74d654e5006b25bfe18f390cc5a3915b88ac",
+      "time_difference": 3600,
+      "price_deviation": 1,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "HWUSD/USDC.RR",
+      "id": "90730ebbd6d0e9b9fe41d099e31b06f5465a2164e468d77126b78e3017f19fa2",
       "time_difference": 3600,
       "price_deviation": 1,
       "confidence_ratio": 100

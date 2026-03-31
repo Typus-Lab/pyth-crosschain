@@ -60,7 +60,7 @@
       "alias": "DMC/USD",
       "id": "8abfa63ae82ca2fbc271861375e497166d8792580fb7c2ffcf014d2a131433f0",
       "time_difference": 60,
-      "price_deviation": 0.5,
+      "price_deviation": 3,
       "confidence_ratio": 100
     },
     {
@@ -102,7 +102,7 @@
       "alias": "HIPPO/USD",
       "id": "f2c5249856da2fbe0221e163b3fed678dd6f76515ab933292dfb4f15a1de8f8c",
       "time_difference": 60,
-      "price_deviation": 0.5,
+      "price_deviation": 3,
       "confidence_ratio": 100
     },
     {
@@ -115,13 +115,6 @@
     {
       "alias": "LBTC/USD",
       "id": "8f257aab6e7698bb92b15511915e593d6f8eae914452f781874754b03d0c612b",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "LOFI/USD",
-      "id": "82eebc2c47490ba9c0f9bc35ea9fb57a7e2bbf69b84a04ea2a3525153b8090ea",
       "time_difference": 60,
       "price_deviation": 0.5,
       "confidence_ratio": 100
@@ -183,15 +176,15 @@
       "confidence_ratio": 100
     },
     {
-      "alias": "TRX/USD",
-      "id": "67aed5a24fdad045475e7195c98a98aea119c763f272d4523f5bac93a4f33c2b",
+      "alias": "SUIUSDE/USD",
+      "id": "8cead549d0e770dea8fdf5e018a85d59585265cf8bff16ba83962fc7996dbb7f",
       "time_difference": 60,
       "price_deviation": 0.5,
       "confidence_ratio": 100
     },
     {
-      "alias": "TURBOS/USD",
-      "id": "f9c2e890443dd995d0baafc08eea3358be1ffb874f93f99c30b3816c460bbac3",
+      "alias": "TRX/USD",
+      "id": "67aed5a24fdad045475e7195c98a98aea119c763f272d4523f5bac93a4f33c2b",
       "time_difference": 60,
       "price_deviation": 0.5,
       "confidence_ratio": 100
@@ -206,6 +199,13 @@
     {
       "alias": "USDT/USD",
       "id": "2b89b9dc8fdf9f34709a5b106b472f0f39bb6ca9ce04b0fd7f2e971688e2e53b",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "USDSUI/USD",
+      "id": "d510fcdb3a63f35d3bb118d5db3afc5815a3f13bc55d48abb893b63f0315902a",
       "time_difference": 60,
       "price_deviation": 0.5,
       "confidence_ratio": 100

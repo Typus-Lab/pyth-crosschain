@@ -2,21 +2,20 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import { Menu, Transition } from '@headlessui/react'
-import Arrow from '@images/icons/down.inline.svg'
 import type { PythCluster } from '@pythnetwork/client'
 import { useRouter } from 'next/router'
 import { Fragment, useCallback, useContext, useEffect } from 'react'
 
 import { ClusterContext, DEFAULT_CLUSTER } from '../contexts/ClusterContext'
+import Arrow from '../images/icons/down.inline.svg'
 
 const ClusterSwitch = ({ light }: { light?: boolean | null }) => {
   const router = useRouter()
 
   const { cluster, setCluster } = useContext(ClusterContext)
   const handleChange = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (event: any) => {
       if (event.target.value) {
         router.query.cluster = event.target.value

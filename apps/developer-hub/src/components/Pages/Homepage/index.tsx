@@ -51,21 +51,21 @@ export const Homepage = () => {
             title="Pyth Token"
             description="The native token powering governance and staking across the Pyth Network."
             url="/pyth-token"
-            urlLabel="Link"
+            urlLabel="Read more"
             image={<SignalImage />}
           />
           <SectionCard
             title="Oracle Integrity Staking"
             description="Stake PYTH to support data publishers and secure the integrity of Pyth price feeds."
             url="/oracle-integrity-staking"
-            urlLabel="Link"
+            urlLabel="Read more"
             image={<SignalImage />}
           />
           <SectionCard
             title="Pyth Metrics"
             description="Track network performance, feed activity, and ecosystem growth in real time."
             url="/metrics"
-            urlLabel="Link"
+            urlLabel="Read more"
             image={<SignalImage />}
           />
         </SectionCards>
@@ -102,6 +102,7 @@ export const Homepage = () => {
             url="https://pyth-lazer.dourolabs.app/docs"
             urlLabel="Link"
             image={<SignalImage />}
+            target="_blank"
           />
         </SectionCards>
       </Section>
@@ -130,11 +131,11 @@ const products: ProductCardConfig[] = [
     quickLinks: [
       {
         label: "Get Pyth Pro Access Token",
-        href: "/price-feeds/pro/access-token",
+        href: "/price-feeds/pro/acquire-access-token",
       },
       {
         label: "Browse Supported Feeds",
-        href: "/price-feeds/pro/price-feeds-ids",
+        href: "/price-feeds/pro/price-feed-ids",
       },
       { label: "Pricing", href: "https://www.pyth.network/pricing" },
     ],
@@ -171,6 +172,7 @@ const products: ProductCardConfig[] = [
       { label: "On-chain randomness" },
       { label: "Verifiable results" },
       { label: "Pay in native token" },
+      { label: "Supports 20+ EVM chains" },
     ],
     quickLinks: [
       {

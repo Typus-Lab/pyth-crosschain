@@ -57,8 +57,58 @@ library PythLazerLib {
         return ((feed.triStateMap >> (2 * propId)) & 3) != 0;
     }
 
+    // ============================================================================
+    // Parsing functions (for bytes memory payloads)
+    // ============================================================================
+
+    // Helper functions to read from bytes memory (since slicing doesn't work)
+    // These use assembly to read the correct number of bytes and handle endianness
+    function _readBytes1(
+        bytes memory data,
+        uint16 pos
+    ) private pure returns (uint8 value) {
+        assembly {
+            let word := mload(add(add(data, 0x20), pos))
+            // Read first byte (most significant byte in the word)
+            value := shr(248, word)
+        }
+    }
+
+    function _readBytes2(
+        bytes memory data,
+        uint16 pos
+    ) private pure returns (uint16 value) {
+        assembly {
+            let word := mload(add(add(data, 0x20), pos))
+            // Read first 2 bytes (most significant bytes in the word)
+            value := shr(240, word)
+        }
+    }
+
+    function _readBytes4(
+        bytes memory data,
+        uint16 pos
+    ) private pure returns (uint32 value) {
+        assembly {
+            let word := mload(add(add(data, 0x20), pos))
+            // Read first 4 bytes (most significant bytes in the word)
+            value := shr(224, word)
+        }
+    }
+
+    function _readBytes8(
+        bytes memory data,
+        uint16 pos
+    ) private pure returns (uint64 value) {
+        assembly {
+            let word := mload(add(add(data, 0x20), pos))
+            // Read first 8 bytes (most significant bytes in the word)
+            value := shr(192, word)
+        }
+    }
+
     function parsePayloadHeader(
-        bytes calldata update
+        bytes memory update
     )
         public
         pure
@@ -72,90 +122,90 @@ library PythLazerLib {
         uint32 FORMAT_MAGIC = 2479346549;
 
         pos = 0;
-        uint32 magic = uint32(bytes4(update[pos:pos + 4]));
+        uint32 magic = _readBytes4(update, pos);
         pos += 4;
         if (magic != FORMAT_MAGIC) {
             revert("invalid magic");
         }
-        timestamp = uint64(bytes8(update[pos:pos + 8]));
+        timestamp = _readBytes8(update, pos);
         pos += 8;
-        channel = PythLazerStructs.Channel(uint8(update[pos]));
+        channel = PythLazerStructs.Channel(_readBytes1(update, pos));
         pos += 1;
-        feedsLen = uint8(update[pos]);
+        feedsLen = uint8(_readBytes1(update, pos));
         pos += 1;
     }
 
     function parseFeedHeader(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
     )
         public
         pure
         returns (uint32 feed_id, uint8 num_properties, uint16 new_pos)
     {
-        feed_id = uint32(bytes4(update[pos:pos + 4]));
+        feed_id = _readBytes4(update, pos);
         pos += 4;
-        num_properties = uint8(update[pos]);
+        num_properties = uint8(_readBytes1(update, pos));
         pos += 1;
         new_pos = pos;
     }
 
     function parseFeedProperty(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
     )
         public
         pure
         returns (PythLazerStructs.PriceFeedProperty property, uint16 new_pos)
     {
-        uint8 propertyId = uint8(update[pos]);
-        require(propertyId <= 8, "Unknown property");
+        uint8 propertyId = _readBytes1(update, pos);
+        require(propertyId <= 12, "Unknown property");
         property = PythLazerStructs.PriceFeedProperty(propertyId);
         pos += 1;
         new_pos = pos;
     }
 
     function parseFeedValueUint64(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
-    ) public pure returns (uint64 value, uint16 new_pos) {
-        value = uint64(bytes8(update[pos:pos + 8]));
+    ) internal pure returns (uint64 value, uint16 new_pos) {
+        value = _readBytes8(update, pos);
         pos += 8;
         new_pos = pos;
     }
 
     function parseFeedValueInt64(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
-    ) public pure returns (int64 value, uint16 new_pos) {
-        value = int64(uint64(bytes8(update[pos:pos + 8])));
+    ) internal pure returns (int64 value, uint16 new_pos) {
+        value = int64(_readBytes8(update, pos));
         pos += 8;
         new_pos = pos;
     }
 
     function parseFeedValueUint16(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
-    ) public pure returns (uint16 value, uint16 new_pos) {
-        value = uint16(bytes2(update[pos:pos + 2]));
+    ) internal pure returns (uint16 value, uint16 new_pos) {
+        value = _readBytes2(update, pos);
         pos += 2;
         new_pos = pos;
     }
 
     function parseFeedValueInt16(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
-    ) public pure returns (int16 value, uint16 new_pos) {
-        value = int16(uint16(bytes2(update[pos:pos + 2])));
+    ) internal pure returns (int16 value, uint16 new_pos) {
+        value = int16(_readBytes2(update, pos));
         pos += 2;
         new_pos = pos;
     }
 
     function parseFeedValueUint8(
-        bytes calldata update,
+        bytes memory update,
         uint16 pos
-    ) public pure returns (uint8 value, uint16 new_pos) {
-        value = uint8(update[pos]);
+    ) internal pure returns (uint8 value, uint16 new_pos) {
+        value = _readBytes1(update, pos);
         pos += 1;
         new_pos = pos;
     }
@@ -165,7 +215,7 @@ library PythLazerLib {
     /// @param payload The payload bytes (after signature verification)
     /// @return update The parsed Update struct containing all feeds and their properties
     function parseUpdateFromPayload(
-        bytes calldata payload
+        bytes memory payload
     ) public pure returns (PythLazerStructs.Update memory update) {
         // Parse payload header
         uint16 pos;
@@ -201,16 +251,17 @@ library PythLazerLib {
                 // Price Property
                 if (property == PythLazerStructs.PriceFeedProperty.Price) {
                     (feed._price, pos) = parseFeedValueInt64(payload, pos);
-                    if (feed._price != 0)
+                    if (feed._price != 0) {
                         _setPresent(
                             feed,
                             uint8(PythLazerStructs.PriceFeedProperty.Price)
                         );
-                    else
+                    } else {
                         _setApplicableButMissing(
                             feed,
                             uint8(PythLazerStructs.PriceFeedProperty.Price)
                         );
+                    }
 
                     // Best Bid Price Property
                 } else if (
@@ -307,16 +358,17 @@ library PythLazerLib {
                         payload,
                         pos
                     );
-                    if (feed._confidence != 0)
+                    if (feed._confidence != 0) {
                         _setPresent(
                             feed,
                             uint8(PythLazerStructs.PriceFeedProperty.Confidence)
                         );
-                    else
+                    } else {
                         _setApplicableButMissing(
                             feed,
                             uint8(PythLazerStructs.PriceFeedProperty.Confidence)
                         );
+                    }
 
                     // Funding Rate Property
                 } else if (
@@ -402,6 +454,96 @@ library PythLazerLib {
                                 PythLazerStructs
                                     .PriceFeedProperty
                                     .FundingRateInterval
+                            )
+                        );
+                    }
+
+                    // Market Session Property
+                } else if (
+                    property == PythLazerStructs.PriceFeedProperty.MarketSession
+                ) {
+                    int16 marketSessionValue;
+                    (marketSessionValue, pos) = parseFeedValueInt16(
+                        payload,
+                        pos
+                    );
+                    require(
+                        marketSessionValue >= 0 && marketSessionValue <= 4,
+                        "Invalid market session value"
+                    );
+                    feed._marketSession = PythLazerStructs.MarketSession(
+                        uint8(uint16(marketSessionValue))
+                    );
+                    _setPresent(
+                        feed,
+                        uint8(PythLazerStructs.PriceFeedProperty.MarketSession)
+                    );
+                    // EMA Price Property
+                } else if (
+                    property == PythLazerStructs.PriceFeedProperty.EmaPrice
+                ) {
+                    (feed._emaPrice, pos) = parseFeedValueInt64(payload, pos);
+                    if (feed._emaPrice != 0) {
+                        _setPresent(
+                            feed,
+                            uint8(PythLazerStructs.PriceFeedProperty.EmaPrice)
+                        );
+                    } else {
+                        _setApplicableButMissing(
+                            feed,
+                            uint8(PythLazerStructs.PriceFeedProperty.EmaPrice)
+                        );
+                    }
+                    // EMA Confidence Property
+                } else if (
+                    property == PythLazerStructs.PriceFeedProperty.EmaConfidence
+                ) {
+                    (feed._emaConfidence, pos) = parseFeedValueUint64(
+                        payload,
+                        pos
+                    );
+                    if (feed._emaConfidence != 0) {
+                        _setPresent(
+                            feed,
+                            uint8(
+                                PythLazerStructs.PriceFeedProperty.EmaConfidence
+                            )
+                        );
+                    } else {
+                        _setApplicableButMissing(
+                            feed,
+                            uint8(
+                                PythLazerStructs.PriceFeedProperty.EmaConfidence
+                            )
+                        );
+                    }
+                    // Feed Update Timestamp Property
+                } else if (
+                    property ==
+                    PythLazerStructs.PriceFeedProperty.FeedUpdateTimestamp
+                ) {
+                    uint8 exists;
+                    (exists, pos) = parseFeedValueUint8(payload, pos);
+                    if (exists != 0) {
+                        (feed._feedUpdateTimestamp, pos) = parseFeedValueUint64(
+                            payload,
+                            pos
+                        );
+                        _setPresent(
+                            feed,
+                            uint8(
+                                PythLazerStructs
+                                    .PriceFeedProperty
+                                    .FeedUpdateTimestamp
+                            )
+                        );
+                    } else {
+                        _setApplicableButMissing(
+                            feed,
+                            uint8(
+                                PythLazerStructs
+                                    .PriceFeedProperty
+                                    .FeedUpdateTimestamp
                             )
                         );
                     }
@@ -513,6 +655,47 @@ library PythLazerLib {
             );
     }
 
+    /// @notice Check if market session exists
+    function hasMarketSession(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _hasValue(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.MarketSession)
+            );
+    }
+
+    /// @notice Check if EMA price exists
+    function hasEmaPrice(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _hasValue(feed, uint8(PythLazerStructs.PriceFeedProperty.EmaPrice));
+    }
+
+    /// @notice Check if EMA confidence exists
+    function hasEmaConfidence(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _hasValue(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.EmaConfidence)
+            );
+    }
+
+    /// @notice Check if feed update timestamp exists
+    function hasFeedUpdateTimestamp(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _hasValue(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.FeedUpdateTimestamp)
+            );
+    }
+
     // Requested helpers — property included in this update
     function isPriceRequested(
         PythLazerStructs.Feed memory feed
@@ -598,6 +781,46 @@ library PythLazerLib {
             _isRequested(
                 feed,
                 uint8(PythLazerStructs.PriceFeedProperty.FundingRateInterval)
+            );
+    }
+
+    function isMarketSessionRequested(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _isRequested(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.MarketSession)
+            );
+    }
+
+    function isEmaPriceRequested(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _isRequested(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.EmaPrice)
+            );
+    }
+
+    function isEmaConfidenceRequested(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _isRequested(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.EmaConfidence)
+            );
+    }
+
+    function isFeedUpdateTimestampRequested(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (bool) {
+        return
+            _isRequested(
+                feed,
+                uint8(PythLazerStructs.PriceFeedProperty.FeedUpdateTimestamp)
             );
     }
 
@@ -730,5 +953,72 @@ library PythLazerLib {
             "Funding rate interval is not present for the timestamp"
         );
         return feed._fundingRateInterval;
+    }
+
+    /// @notice Get market session (reverts if not exists)
+    function getMarketSession(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (PythLazerStructs.MarketSession) {
+        require(
+            isMarketSessionRequested(feed),
+            "Market session is not requested for the timestamp"
+        );
+        require(
+            hasMarketSession(feed),
+            "Market session is not present for the timestamp"
+        );
+        return feed._marketSession;
+    }
+
+    /// @notice Get EMA price (reverts if not exists)
+    function getEmaPrice(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (int64) {
+        require(
+            isEmaPriceRequested(feed),
+            "EMA price is not requested for the timestamp"
+        );
+        require(
+            hasEmaPrice(feed),
+            "EMA price is not present for the timestamp"
+        );
+        return feed._emaPrice;
+    }
+
+    /// @notice Get EMA confidence (reverts if not exists)
+    function getEmaConfidence(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (uint64) {
+        require(
+            isEmaConfidenceRequested(feed),
+            "EMA confidence is not requested for the timestamp"
+        );
+        require(
+            hasEmaConfidence(feed),
+            "EMA confidence is not present for the timestamp"
+        );
+        return feed._emaConfidence;
+    }
+
+    /// @notice Get feed update timestamp (reverts if not exists)
+    function getFeedUpdateTimestamp(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (uint64) {
+        require(
+            isFeedUpdateTimestampRequested(feed),
+            "feed update timestamp is not requested for the timestamp"
+        );
+        require(
+            hasFeedUpdateTimestamp(feed),
+            "feed update timestamp is not present for the timestamp"
+        );
+        return feed._feedUpdateTimestamp;
+    }
+
+    /// @notice Get feed ID
+    function getFeedId(
+        PythLazerStructs.Feed memory feed
+    ) public pure returns (uint32) {
+        return feed.feedId;
     }
 }

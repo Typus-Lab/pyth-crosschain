@@ -7,6 +7,12 @@ slug: /price-feeds/pro/how-lazer-works
 Pyth Pro is a permissioned service that provides ultra-low-latency market data to consumers.
 It aggregates data from multiple publishers and distributes it to consumers through a multi-tier architecture.
 
+## Architecture Diagram
+
+The following diagram illustrates the data flow through different components of Pyth Pro.
+
+![Pyth Pro Architecture](/images/lazer/Pyth_Pro_Architecture.png)
+
 ## System Services
 
 The architecture consists of five main types of services that work together to provide ultra-low-latency data to consumers.
@@ -53,7 +59,7 @@ It embeds aggregation logic to compute median prices, confidence intervals (usin
 
 - **WebSocket streaming**: Provides `/v1/stream` endpoint for real-time price updates
 - **HTTP REST API**: Offers `/v1/latest_price` for on-demand price queries
-- **Channel types**: Supports real-time and fixed-rate channels (50ms, 200ms, 1s)
+- **Channel types**: Supports real-time and fixed-rate channels (50ms, 200ms, 1000ms)
 - **Multi-chain support**: Generates on-chain payloads for Solana, EVM, and other chains
 
 #### Aggregation logic

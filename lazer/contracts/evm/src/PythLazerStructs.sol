@@ -19,7 +19,11 @@ library PythLazerStructs {
         Confidence,
         FundingRate,
         FundingTimestamp,
-        FundingRateInterval
+        FundingRateInterval,
+        MarketSession,
+        EmaPrice,
+        EmaConfidence,
+        FeedUpdateTimestamp
     }
 
     // Tri-state for a property's availability within a feed at a given timestamp
@@ -30,6 +34,14 @@ library PythLazerStructs {
         NotApplicable,
         ApplicableButMissing,
         Present
+    }
+
+    enum MarketSession {
+        Regular,
+        PreMarket,
+        PostMarket,
+        OverNight,
+        Closed
     }
 
     struct Feed {
@@ -52,6 +64,11 @@ library PythLazerStructs {
         int64 _fundingRate;
         uint64 _fundingTimestamp;
         uint64 _fundingRateInterval;
+        // Slot 4: (25 bytes): 1 + 8 + 8 + 8
+        MarketSession _marketSession;
+        int64 _emaPrice;
+        uint64 _emaConfidence;
+        uint64 _feedUpdateTimestamp;
     }
 
     struct Update {

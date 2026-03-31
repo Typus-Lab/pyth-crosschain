@@ -1,5 +1,3 @@
-/* eslint-disable n/no-process-env */
-import { NuqsAdapter } from '@pythnetwork/react-hooks/nuqs-adapters-next'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import {
   ConnectionProvider,
@@ -18,14 +16,36 @@ import {
 import { clusterApiUrl } from '@solana/web3.js'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { DefaultSeo } from 'next-seo'
+import { generateDefaultSeo } from 'next-seo/pages'
 import { useMemo } from 'react'
 import { Toaster } from 'react-hot-toast'
 
 import { ClusterProvider } from '../contexts/ClusterContext'
 import { ProgramProvider } from '../contexts/ProgramContext'
-import SEO from '../next-seo.config.js'
 import '../styles/globals.css'
+
+const SEO = {
+  defaultTitle: 'Pyth Network',
+  titleTemplate: '%s | Pyth Network',
+  description:
+    'Pyth is building a way to deliver a decentralized, cross-chain market of verifiable data from first-party sources to any smart contract, anywhere.',
+  openGraph: {
+    type: 'website',
+    images: [
+      {
+        url: 'https://proposals.pyth.network/default-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Pyth Network',
+        type: 'image/png',
+      },
+    ],
+  },
+  twitter: {
+    handle: '@PythNetwork',
+    cardType: 'summary_large_image',
+  },
+} as const
 
 const walletConnectConfig: WalletConnectWalletAdapterConfig = {
   network: WalletAdapterNetwork.Mainnet,
@@ -64,37 +84,35 @@ function MyApp({ Component, pageProps }: AppProps) {
   )
 
   return (
-    <NuqsAdapter>
-      <ConnectionProvider
-        endpoint={endpoint || clusterApiUrl(WalletAdapterNetwork.Devnet)}
-      >
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>
-            <ClusterProvider>
-              <ProgramProvider>
-                <Head>
-                  <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-                  />
-                </Head>
-                <DefaultSeo {...SEO} />
-                <Component {...pageProps} />
-                <Toaster
-                  position="bottom-left"
-                  toastOptions={{
-                    style: {
-                      wordBreak: 'break-word',
-                    },
-                  }}
-                  reverseOrder={false}
+    <ConnectionProvider
+      endpoint={endpoint || clusterApiUrl(WalletAdapterNetwork.Devnet)}
+    >
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <ClusterProvider>
+            <ProgramProvider>
+              <Head>
+                <meta
+                  name="viewport"
+                  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
                 />
-              </ProgramProvider>
-            </ClusterProvider>
-          </WalletModalProvider>
-        </WalletProvider>
-      </ConnectionProvider>
-    </NuqsAdapter>
+                {generateDefaultSeo(SEO)}
+              </Head>
+              <Component {...pageProps} />
+              <Toaster
+                position="bottom-left"
+                toastOptions={{
+                  style: {
+                    wordBreak: 'break-word',
+                  },
+                }}
+                reverseOrder={false}
+              />
+            </ProgramProvider>
+          </ClusterProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   )
 }
 

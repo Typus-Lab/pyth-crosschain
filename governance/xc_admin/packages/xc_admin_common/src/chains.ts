@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNumericSeparators: <explanation> */
 import { CHAINS as WORMHOLE_CHAINS } from "@certusone/wormhole-sdk";
 // GUIDELINES to add a chain
 // PYTH will have:
@@ -34,6 +35,7 @@ export const RECEIVER_CHAINS = {
   mantis_mainnet: 40008,
   sonic_mainnet: 40009,
   fogo_testnet: 40010,
+  fogo_mainnet: 40011,
 
   cronos: 60001,
   kcc: 60002,
@@ -115,12 +117,16 @@ export const RECEIVER_CHAINS = {
   mezo: 60084,
   iota_sui_mainnet: 60085,
   camp_network: 60086,
-  spiderman: 60087,
+  monad: 60087,
   zero_gravity: 60088,
   itsnotreal: 60089, // Deprecated
   plasma: 60090,
-  itsnotreal2: 60091,
+  ethereal: 60091,
   injective_evm: 60092,
+  orange: 60093,
+  tempo: 60094,
+  megaeth: 60095,
+  fluent: 60096,
 
   // Testnets as a separate chain ids (to use stable data sources and governance for them)
   injective_testnet: 60013,
@@ -264,6 +270,9 @@ export const RECEIVER_CHAINS = {
   hoodi: 50134, // Ethereum hoodi, the new Ethereum testnet
   taiko_hoodi: 50135,
   morph_hoodi: 50136,
+  celo_sepolia_testnet: 50137,
+  arc_testnet: 50138,
+  tempo_testnet: 50139,
 };
 
 // If there is any overlapping value the receiver chain will replace the wormhole

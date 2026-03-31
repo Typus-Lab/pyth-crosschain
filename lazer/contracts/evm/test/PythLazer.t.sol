@@ -129,16 +129,17 @@ contract PythLazerTest is Test {
     }
 
     /// @notice Build a property with given ID and encoded value bytes
-    /// @param propertyId The property ID (0-8)
+    /// @param propertyId The property ID (0-9)
     /// @param valueBytes The encoded value (int64/uint64 = 8 bytes, uint16/int16 = 2 bytes)
     function buildProperty(
         uint8 propertyId,
         bytes memory valueBytes
     ) internal pure returns (bytes memory) {
         // Funding properties (6, 7, 8) need a bool flag before the value
-        if (propertyId >= 6 && propertyId <= 8) {
+        if ((propertyId >= 6 && propertyId <= 8) || propertyId == 12) {
             return abi.encodePacked(propertyId, uint8(1), valueBytes);
         } else {
+            // MarketSession (9) and other properties don't need the exists flag
             return abi.encodePacked(propertyId, valueBytes);
         }
     }
@@ -171,9 +172,9 @@ contract PythLazerTest is Test {
         return abi.encodePacked(value);
     }
 
-    /// @notice Test parsing single feed with all 9 properties
-    function test_parseUpdate_singleFeed_allProperties() public pure {
-        bytes[] memory properties = new bytes[](9);
+    /// @notice Test parsing single feed with all 10 properties
+    function test_parseUpdate_singleFeed_allProperties() public view {
+        bytes[] memory properties = new bytes[](13);
         properties[0] = buildProperty(0, encodeInt64(100000000)); // price
         properties[1] = buildProperty(1, encodeInt64(99000000)); // bestBid
         properties[2] = buildProperty(2, encodeInt64(101000000)); // bestAsk
@@ -183,6 +184,10 @@ contract PythLazerTest is Test {
         properties[6] = buildProperty(6, encodeInt64(123456)); // fundingRate
         properties[7] = buildProperty(7, encodeUint64(1234567890)); // fundingTimestamp
         properties[8] = buildProperty(8, encodeUint64(3600)); // fundingRateInterval
+        properties[9] = buildProperty(9, encodeInt16(0)); // marketSession (0 = REGULAR)
+        properties[10] = buildProperty(10, encodeInt64(110000000)); // EMA price
+        properties[11] = buildProperty(11, encodeInt64(55000)); // EMA confidence
+        properties[12] = buildProperty(12, encodeUint64(1234500000)); // feedUpdateTimestamp
 
         bytes[] memory feeds = new bytes[](1);
         feeds[0] = buildFeedDataMulti(1, properties); // feedId = 1
@@ -207,6 +212,7 @@ contract PythLazerTest is Test {
         // Verify feed data
         PythLazerStructs.Feed memory feed = update.feeds[0];
         assertEq(feed.feedId, 1);
+        assertEq(PythLazerLib.getFeedId(feed), 1);
         assertEq(feed._price, 100000000);
         assertEq(feed._bestBidPrice, 99000000);
         assertEq(feed._bestAskPrice, 101000000);
@@ -216,6 +222,13 @@ contract PythLazerTest is Test {
         assertEq(feed._fundingRate, 123456);
         assertEq(feed._fundingTimestamp, 1234567890);
         assertEq(feed._fundingRateInterval, 3600);
+        assertEq(
+            uint8(feed._marketSession),
+            uint8(PythLazerStructs.MarketSession.Regular)
+        );
+        assertEq(feed._emaPrice, 110000000);
+        assertEq(feed._emaConfidence, 55000);
+        assertEq(feed._feedUpdateTimestamp, 1234500000);
 
         // Verify exists flags (all should be set)
         assertTrue(PythLazerLib.hasPrice(feed));
@@ -227,10 +240,14 @@ contract PythLazerTest is Test {
         assertTrue(PythLazerLib.hasFundingRate(feed));
         assertTrue(PythLazerLib.hasFundingTimestamp(feed));
         assertTrue(PythLazerLib.hasFundingRateInterval(feed));
+        assertTrue(PythLazerLib.hasMarketSession(feed));
+        assertTrue(PythLazerLib.hasEmaPrice(feed));
+        assertTrue(PythLazerLib.hasEmaConfidence(feed));
+        assertTrue(PythLazerLib.hasFeedUpdateTimestamp(feed));
     }
 
     /// @notice Test parsing single feed with minimal properties
-    function test_parseUpdate_singleFeed_minimalProperties() public pure {
+    function test_parseUpdate_singleFeed_minimalProperties() public {
         bytes[] memory properties = new bytes[](2);
         properties[0] = buildProperty(0, encodeInt64(50000000));
         properties[1] = buildProperty(4, encodeInt16(-6));
@@ -251,6 +268,7 @@ contract PythLazerTest is Test {
         PythLazerStructs.Feed memory feed = update.feeds[0];
 
         assertEq(feed.feedId, 10);
+        assertEq(PythLazerLib.getFeedId(feed), 10);
         assertEq(feed._price, 50000000);
         assertEq(feed._exponent, -6);
 
@@ -270,10 +288,14 @@ contract PythLazerTest is Test {
         assertFalse(PythLazerLib.isFundingRateRequested(feed));
         assertFalse(PythLazerLib.isFundingTimestampRequested(feed));
         assertFalse(PythLazerLib.isFundingRateIntervalRequested(feed));
+        assertFalse(PythLazerLib.isMarketSessionRequested(feed));
+        assertFalse(PythLazerLib.isEmaPriceRequested(feed));
+        assertFalse(PythLazerLib.isEmaConfidenceRequested(feed));
+        assertFalse(PythLazerLib.isFeedUpdateTimestampRequested(feed));
     }
 
     /// @notice Test parsing multiple feeds
-    function test_parseUpdate_multipleFeeds() public pure {
+    function test_parseUpdate_multipleFeeds() public {
         // Feed 1
         bytes[] memory props1 = new bytes[](5);
         props1[0] = buildProperty(0, encodeInt64(50000000000));
@@ -311,6 +333,7 @@ contract PythLazerTest is Test {
 
         // Verify Feed 1
         assertEq(update.feeds[0].feedId, 1);
+        assertEq(PythLazerLib.getFeedId(update.feeds[0]), 1);
         assertEq(update.feeds[0]._price, 50000000000);
         assertTrue(PythLazerLib.hasConfidence(update.feeds[0]));
         // Requested checks for Feed 1 (props: price, publisherCount, exponent, confidence, bestBid)
@@ -325,9 +348,16 @@ contract PythLazerTest is Test {
         assertFalse(
             PythLazerLib.isFundingRateIntervalRequested(update.feeds[0])
         );
+        assertFalse(PythLazerLib.isMarketSessionRequested(update.feeds[0]));
+        assertFalse(PythLazerLib.isEmaPriceRequested(update.feeds[0]));
+        assertFalse(PythLazerLib.isEmaConfidenceRequested(update.feeds[0]));
+        assertFalse(
+            PythLazerLib.isFeedUpdateTimestampRequested(update.feeds[0])
+        );
 
         // Verify Feed 2
         assertEq(update.feeds[1].feedId, 2);
+        assertEq(PythLazerLib.getFeedId(update.feeds[1]), 2);
         assertEq(update.feeds[1]._price, 3000000000);
         assertFalse(PythLazerLib.hasConfidence(update.feeds[1]));
         // Requested checks for Feed 2 (props: price, exponent)
@@ -342,9 +372,16 @@ contract PythLazerTest is Test {
         assertFalse(
             PythLazerLib.isFundingRateIntervalRequested(update.feeds[1])
         );
+        assertFalse(PythLazerLib.isMarketSessionRequested(update.feeds[1]));
+        assertFalse(PythLazerLib.isEmaPriceRequested(update.feeds[1]));
+        assertFalse(PythLazerLib.isEmaConfidenceRequested(update.feeds[1]));
+        assertFalse(
+            PythLazerLib.isFeedUpdateTimestampRequested(update.feeds[1])
+        );
 
         // Verify Feed 3
         assertEq(update.feeds[2].feedId, 3);
+        assertEq(PythLazerLib.getFeedId(update.feeds[2]), 3);
         assertEq(update.feeds[2]._price, 100000000);
         assertEq(update.feeds[2]._publisherCount, 7);
         // Requested checks for Feed 3 (props: price, exponent, publisherCount)
@@ -359,10 +396,101 @@ contract PythLazerTest is Test {
         assertFalse(
             PythLazerLib.isFundingRateIntervalRequested(update.feeds[2])
         );
+        assertFalse(PythLazerLib.isMarketSessionRequested(update.feeds[2]));
+        assertFalse(PythLazerLib.isEmaPriceRequested(update.feeds[2]));
+        assertFalse(PythLazerLib.isEmaConfidenceRequested(update.feeds[2]));
+        assertFalse(
+            PythLazerLib.isFeedUpdateTimestampRequested(update.feeds[2])
+        );
+    }
+
+    /// @notice Test parsing MarketSession property
+    function test_parseUpdate_marketSession() public {
+        bytes[] memory properties = new bytes[](3);
+        properties[0] = buildProperty(0, encodeInt64(100000000)); // price
+        properties[1] = buildProperty(4, encodeInt16(-8)); // exponent
+        properties[2] = buildProperty(9, encodeInt16(1)); // marketSession (1 = PRE_MARKET)
+
+        bytes[] memory feeds = new bytes[](1);
+        feeds[0] = buildFeedDataMulti(1, properties);
+
+        bytes memory payload = buildPayload(
+            1700000000,
+            PythLazerStructs.Channel.RealTime,
+            feeds
+        );
+
+        PythLazerStructs.Update memory update = PythLazerLib
+            .parseUpdateFromPayload(payload);
+
+        PythLazerStructs.Feed memory feed = update.feeds[0];
+
+        assertEq(
+            uint8(feed._marketSession),
+            uint8(PythLazerStructs.MarketSession.PreMarket)
+        );
+        assertTrue(PythLazerLib.hasMarketSession(feed));
+        assertTrue(PythLazerLib.isMarketSessionRequested(feed));
+        assertEq(
+            uint8(PythLazerLib.getMarketSession(feed)),
+            uint8(PythLazerStructs.MarketSession.PreMarket)
+        );
+
+        // Test different market session values
+        bytes[] memory properties2 = new bytes[](3);
+        properties2[0] = buildProperty(0, encodeInt64(200000000));
+        properties2[1] = buildProperty(4, encodeInt16(-8));
+        properties2[2] = buildProperty(9, encodeInt16(2)); // POST_MARKET
+
+        bytes[] memory feeds2 = new bytes[](1);
+        feeds2[0] = buildFeedDataMulti(2, properties2);
+
+        bytes memory payload2 = buildPayload(
+            1700000001,
+            PythLazerStructs.Channel.RealTime,
+            feeds2
+        );
+
+        PythLazerStructs.Update memory update2 = PythLazerLib
+            .parseUpdateFromPayload(payload2);
+
+        PythLazerStructs.Feed memory feed2 = update2.feeds[0];
+        assertEq(
+            uint8(feed2._marketSession),
+            uint8(PythLazerStructs.MarketSession.PostMarket)
+        );
+        assertEq(
+            uint8(PythLazerLib.getMarketSession(feed2)),
+            uint8(PythLazerStructs.MarketSession.PostMarket)
+        );
+    }
+
+    /// @notice Test MarketSession getter when not requested
+    function test_parseUpdate_marketSessionNotRequested() public {
+        bytes[] memory properties = new bytes[](2);
+        properties[0] = buildProperty(0, encodeInt64(100000000));
+        properties[1] = buildProperty(4, encodeInt16(-8));
+
+        bytes[] memory feeds = new bytes[](1);
+        feeds[0] = buildFeedDataMulti(1, properties);
+
+        bytes memory payload = buildPayload(
+            1700000000,
+            PythLazerStructs.Channel.RealTime,
+            feeds
+        );
+
+        PythLazerStructs.Update memory update = PythLazerLib
+            .parseUpdateFromPayload(payload);
+
+        PythLazerStructs.Feed memory feed = update.feeds[0];
+
+        assertFalse(PythLazerLib.isMarketSessionRequested(feed));
+        assertFalse(PythLazerLib.hasMarketSession(feed));
     }
 
     /// @notice Test when optional properties are zero
-    function test_parseUpdate_optionalMissing_priceZero() public pure {
+    function test_parseUpdate_optionalMissing_priceZero() public {
         bytes[] memory properties = new bytes[](3);
         properties[0] = buildProperty(0, encodeInt64(0));
         properties[1] = buildProperty(4, encodeInt16(-8));
@@ -390,7 +518,7 @@ contract PythLazerTest is Test {
     }
 
     /// @notice Test confidence = 0
-    function test_parseUpdate_optionalMissing_confidenceZero() public pure {
+    function test_parseUpdate_optionalMissing_confidenceZero() public {
         bytes[] memory properties = new bytes[](3);
         properties[0] = buildProperty(0, encodeInt64(100000));
         properties[1] = buildProperty(4, encodeInt16(-6));
@@ -417,7 +545,7 @@ contract PythLazerTest is Test {
     }
 
     /// @notice Test negative values for signed fields
-    function test_parseUpdate_negativeValues() public pure {
+    function test_parseUpdate_negativeValues() public {
         bytes[] memory properties = new bytes[](3);
         properties[0] = buildProperty(0, encodeInt64(-50000000)); // negative price
         properties[1] = buildProperty(4, encodeInt16(-12)); // negative exponent
@@ -471,8 +599,8 @@ contract PythLazerTest is Test {
 
     /// @notice Test unknown property ID
     function test_parseUpdate_unknownProperty() public {
-        // Build payload with invalid property ID (99)
-        bytes memory invalidProperty = buildProperty(99, encodeInt64(100));
+        // Build payload with invalid property ID (13, which is > 12)
+        bytes memory invalidProperty = buildProperty(13, encodeInt64(100));
 
         bytes[] memory properties = new bytes[](1);
         properties[0] = invalidProperty;

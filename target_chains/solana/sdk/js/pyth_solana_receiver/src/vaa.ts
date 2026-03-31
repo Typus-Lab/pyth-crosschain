@@ -1,7 +1,9 @@
+// eslint-disable-next-line unicorn/prefer-node-protocol
+import { Buffer as IsomorphicBuffer } from "buffer";
+
 import { Program } from "@coral-xyz/anchor";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { sha256 } from "@noble/hashes/sha256";
-import type { AccumulatorUpdateData } from "@pythnetwork/price-service-sdk";
 import type { InstructionWithEphemeralSigners } from "@pythnetwork/solana-utils";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
@@ -71,7 +73,7 @@ export function trimSignatures(
     );
   }
 
-  const trimmedVaa = Buffer.concat([
+  const trimmedVaa = IsomorphicBuffer.concat([
     vaa.subarray(0, 6 + n * VAA_SIGNATURE_SIZE),
     vaa.subarray(6 + currentNumSignatures * VAA_SIGNATURE_SIZE),
   ]);
@@ -230,70 +232,6 @@ export async function buildPostEncodedVaaInstructions(
 }
 
 /**
- * Build instructions to post two VAAs for TWAP (Time-Weighted Average Price) calculations,
- * optimized for 3 transactions. This is specifically designed for posting start and end
- * accumulator update VAAs efficiently.
- * The instructions are packed into 3 transactions:
- * - TX1: Initialize and write first part of start VAA
- * - TX2: Initialize and write first part of end VAA
- * - TX3: Write second part and verify both VAAs
- *
- * @param wormhole - The Wormhole program instance
- * @param startUpdateData - Accumulator update data containing the start VAA
- * @param endUpdateData - Accumulator update data containing the end VAA
- * @returns Result containing:
- *   - startEncodedVaaAddress: Public key of the start VAA account
- *   - endEncodedVaaAddress: Public key of the end VAA account
- *   - postInstructions: Instructions to post and verify both VAAs
- *   - closeInstructions: Instructions to close both encoded VAA accounts
- */
-export async function buildPostEncodedVaasForTwapInstructions(
-  wormhole: Program<WormholeCoreBridgeSolana>,
-  startUpdateData: AccumulatorUpdateData,
-  endUpdateData: AccumulatorUpdateData,
-): Promise<{
-  startEncodedVaaAddress: PublicKey;
-  endEncodedVaaAddress: PublicKey;
-  postInstructions: InstructionWithEphemeralSigners[];
-  closeInstructions: InstructionWithEphemeralSigners[];
-}> {
-  const startGroups = await generateVaaInstructionGroups(
-    wormhole,
-    startUpdateData.vaa,
-  );
-  const endGroups = await generateVaaInstructionGroups(
-    wormhole,
-    endUpdateData.vaa,
-  );
-
-  // Pack instructions for optimal 3-transaction pattern:
-  // TX1: start VAA init + first write
-  // TX2: end VAA init + first write
-  // TX3: both VAAs second write + verify
-  const postInstructions = [
-    // TX1
-    ...startGroups.initInstructions,
-    ...startGroups.writeFirstPartInstructions,
-    // TX2
-    ...endGroups.initInstructions,
-    ...endGroups.writeFirstPartInstructions,
-    // TX3
-    ...startGroups.writeSecondPartAndVerifyInstructions,
-    ...endGroups.writeSecondPartAndVerifyInstructions,
-  ];
-
-  return {
-    startEncodedVaaAddress: startGroups.encodedVaaAddress,
-    endEncodedVaaAddress: endGroups.encodedVaaAddress,
-    postInstructions,
-    closeInstructions: [
-      ...startGroups.closeInstructions,
-      ...endGroups.closeInstructions,
-    ],
-  };
-}
-
-/**
  * Build an instruction to close an encoded VAA account, recovering the rent.
  */
 export async function buildCloseEncodedVaaInstruction(
@@ -346,7 +284,7 @@ export async function findEncodedVaaAccountsByWriteAuthority(
         memcmp: {
           offset: 0,
           bytes: bs58.encode(
-            Buffer.from(sha256("account:EncodedVaa").slice(0, 8)),
+            IsomorphicBuffer.from(sha256("account:EncodedVaa").slice(0, 8)),
           ),
         },
       },

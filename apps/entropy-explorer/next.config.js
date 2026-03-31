@@ -21,20 +21,22 @@ const config = {
   },
 
   turbopack: {
+    resolveExtensions: [
+      ".ts",
+      ".tsx",
+      ".js",
+      ".jsx",
+      ".mts",
+      ".mjs",
+      ".cts",
+      ".cjs",
+    ],
     rules: {
       "*.svg": {
         loaders: ["@svgr/webpack"],
         as: "*.js",
       },
     },
-  },
-
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/i,
-      use: ["@svgr/webpack"],
-    });
-    return config;
   },
 
   headers: async () => [

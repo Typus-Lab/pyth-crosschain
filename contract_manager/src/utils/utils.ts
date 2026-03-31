@@ -57,3 +57,10 @@ export const getEvmChainRpcUrl = (chainId: number): string | undefined => {
     return;
   }
 };
+
+export function hasProperty<const P extends string>(
+  value: unknown,
+  name: P,
+): value is Record<P, unknown> {
+  return typeof value === "object" && !!value && name in value;
+}

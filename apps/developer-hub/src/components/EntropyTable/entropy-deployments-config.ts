@@ -22,4 +22,8 @@ export const EntropyDeploymentsConfig: Record<string, ChainOverride> = {
     rpc: "https://rpc.hypurrscan.io",
     nativeCurrency: "HYPE",
   },
+  "143": {
+    nativeCurrency: "MON",
+    explorer: "https://monadvision.com",
+  },
 };

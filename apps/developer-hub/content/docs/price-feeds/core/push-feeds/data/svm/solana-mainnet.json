@@ -161,54 +161,6 @@
       "confidence_ratio": 100
     },
     {
-      "alias": "AUD/USD",
-      "account_address": "6pPXqXcgFFoLEcXfedWJy3ypNZVJ1F3mgipaDFsvZ1co",
-      "id": "67a6f93030420c1c9e3fe37c1ab6b77966af82f995944a9fefce357a22854a80",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "GBP/USD",
-      "account_address": "G25Tm7UkVruTJ7mcbCxFm45XGWwsH72nJKNGcHEQw1tU",
-      "id": "84c2dde9633d93d1bcad84e7dc41c9d56578b7ec52fabedc1f335d673df0a7c1",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "EUR/USD",
-      "account_address": "Fu76ChamBDjE8UuGLV6GP2AcPPSU6gjhkNhAyuoPm7ny",
-      "id": "a995d00bb36a63cef7fd2c287dc105fc8f3d93779f062f09551b0af3e81ec30b",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "XAG/USD",
-      "account_address": "H9JxsWwtDZxjSL6m7cdCVsWibj3JBMD9sxqLjadoZnot",
-      "id": "f2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "XAU/USD",
-      "account_address": "2uPQGpm8X4ZkxMHxrAW1QuhXcse1AHEgPih6Xp9NuEWW",
-      "id": "765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "BLZE/USD",
-      "account_address": "FFv5yoCGhEgWv6mXhwv4KX8A2dYcVAzi88a6Yu8Tf3iB",
-      "id": "93c3def9b169f49eed14c9d73ed0e942c666cf0e1290657ec82038ebb792c2a8",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
       "alias": "JLP/USD",
       "account_address": "2TTGSRSezqFzeLUH8JwRUbtN66XLLaymfYsWRTMjfiMw",
       "id": "c811abc82b4bad1f9bd711a2773ccaa935b03ecef974236942cec5e0eb845a3a",
@@ -289,14 +241,6 @@
       "confidence_ratio": 100
     },
     {
-      "alias": "WTIZ5/USD",
-      "account_address": "3MBVC4DW1KsJcH1CB61XNHMo7CPkKW21gFNUku1sJ33q",
-      "id": "0c62848c8afee091f2c132eef944e3075c6de476129efc872a4202d81ca34f99",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
       "alias": "ZBTC/USD",
       "account_address": "7qFJxM2GefbY2td7cXb6bmXmwVqkeF7kYjaypgZWLBng",
       "id": "3d824c7f7c26ed1c85421ecec8c754e6b52d66a4e45de20a9c9ea91de8b396f9",
@@ -316,14 +260,6 @@
       "alias": "INF/SOL",
       "account_address": "4MbCk4vH47K2gHee6nTg62KScpGu2bV3YDeTZtpQm3ro",
       "id": "49e50653755fbf8018ab65a07be2f208ac8c4bdfc43200934304ca17ee663cab",
-      "time_difference": 60,
-      "price_deviation": 0.5,
-      "confidence_ratio": 100
-    },
-    {
-      "alias": "WTIX5/USD",
-      "account_address": "2SxsutiRd7TBmURrWW2tPR3xeHpJFuGVGAd4Wjddkk7D",
-      "id": "2e8c6b85cf4a79b6d8bce10be470eefb369810b642782cb6aa150f82362e65d1",
       "time_difference": 60,
       "price_deviation": 0.5,
       "confidence_ratio": 100
@@ -353,11 +289,90 @@
       "confidence_ratio": 100
     },
     {
+      "alias": "ORE/USD",
+      "account_address": "GYYQ8gbX4Tndc4WMJ7jSjZTePTvbmgRRxByt54ZQYqvZ",
+      "id": "142b804c658e14ff60886783e46e5a51bdf398b4871d9d8f7c28aa1585cad504",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "NOPAL/USD.RR",
+      "account_address": "3GDZNVfeYJupHxj65tyCC44HW5NHPTycBihFrCEcDTBj",
+      "id": "8858dfaa8998ff44681aa145a8aa5b7772979b1d044a1bbf3cf5d971168baa85",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "NTBILL/USD.RR",
+      "account_address": "FrJxRfRkaktSWrEPsBaJhx7fdofPZZsuNHoh4E9YxZjn",
+      "id": "f03015f29e6c90d5fe62da7d1a13c912c8bf7523d90c981387f82ee0c83332bd",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "NBASIS/USD.RR",
+      "account_address": "Cv7ZRaS7vezPHVfYBYqUvaXBqh9VABbC1JDczCHzAd3j",
+      "id": "fd9397e6dfc968ff8eaa652c6e4b7dfdeb6fdc940afe90c23ca5acfa45d408e1",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "NWISDOM/USD.RR",
+      "account_address": "CTwo3uNzA3Pj1aJRN77Xi7icfq9Q53JWTfppUrEYHfhC",
+      "id": "384986c9655ec6887dbd7f7430d864992f872db2c77ba5781a26b78dad277adc",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "NALPHA/USD.RR",
+      "account_address": "DihTptVgZNyfxN5ya1V5XThRJHhzZ4V2RAPpwvNXkxUK",
+      "id": "57d1e11bea1316c2f7263a39c2780685691585aae34eff39300f5db564501b17",
+      "time_difference": 60,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "CASH/RD.RR",
+      "account_address": "7ELVkNXhZLJGdwPGps8sEBgs583TewjZoRzgf9Zdp5T8",
+      "id": "64c74ffd61574170cfaee65c54c8810adcf83f6c31f3c256d9a290dcbf4ff1a9",
+      "time_difference": 30,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "CASH/USD",
+      "account_address": "F23Xi7VQw1pdre26VmuKnjRcDcrhpqGtHkGdKdSdbM8w",
+      "id": "df3320ef0f4617337b8dbb924f2aaa4f9db08f522a5435b44f9066c1ac4c7f95",
+      "time_difference": 30,
+      "price_deviation": 0.5,
+      "confidence_ratio": 100
+    },
+    {
       "alias": "PST/USDC.RR",
       "account_address": "CBGwQddTeYn3KdvxGWtU95fqCcavzHK9XPFBLENDF5JR",
       "id": "675e36f84a6be779ed793c71eb5c03151e1866c125767f46933626e0610af84d",
       "time_difference": 240,
       "price_deviation": 0.05,
+      "confidence_ratio": 100
+    },
+    {
+      "alias": "JUPUSD/USD",
+      "account_address": "AqSwMCZYnEdnGoFCSLtWVnWf4xyCJuePcztmYWq8SBwp",
+      "id": "8ed858a2214e892c9371694fb6c8a9037b6ed4052c4edf209f8cb988484e81d9",
+      "time_difference": 60,
+      "price_deviation": 0.5
+    },
+    {
+      "alias": "WSTUSR/USR.RR",
+      "account_address": "4iG7tnQXmhPfUHxn7F54T6g3j3UZEFyYcoD6PWeF1YVF",
+      "id": "b74c2bc175c2dab850ce5a5451608501c293fe8410cb4aba7449dd1c355ab706",
+      "time_difference": 540,
+      "price_deviation": 0.001,
       "confidence_ratio": 100
     }
   ]

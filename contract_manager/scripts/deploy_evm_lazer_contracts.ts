@@ -49,7 +49,9 @@
  */
 
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
@@ -67,40 +69,51 @@ const parser = yargs(hideBin(process.argv))
   )
   .options({
     chain: {
-      type: "string",
+      demandOption: true,
       description: "Chain name to deploy to (from EvmChains.json)",
-      demandOption: true,
-    },
-    "private-key": {
       type: "string",
-      description: "Private key for deployment and transactions",
-      demandOption: true,
     },
     deploy: {
-      type: "boolean",
+      default: true,
       description:
         "Deploy the PythLazer contract (default: true if no other flags specified)",
-      default: true,
-    },
-    verify: {
       type: "boolean",
-      description:
-        "Verify contract on block explorer (only used with --deploy)",
-      default: false,
     },
     "etherscan-api-key": {
-      type: "string",
       description:
         "Etherscan API key for verification (required if --verify is true)",
-    },
-    "update-signer": {
       type: "string",
-      description: "Update trusted signer address (requires --expires-at)",
     },
     "expires-at": {
-      type: "number",
       description:
         "Expiration timestamp for trusted signer in Unix timestamp format (required if --update-signer is specified)",
+      type: "number",
+    },
+    "gas-limit": {
+      description:
+        "Gas limit for forge deployment (skips simulation when set). Required for chains with non-standard gas models like MegaETH.",
+      type: "number",
+    },
+    "private-key": {
+      demandOption: true,
+      description: "Private key for deployment and transactions",
+      type: "string",
+    },
+    "raw-tx": {
+      default: false,
+      description:
+        "Sign and send transactions via eth_sendRawTransaction. Required for chains like MegaETH that don't support eth_sendTransaction.",
+      type: "boolean",
+    },
+    "update-signer": {
+      description: "Update trusted signer address (requires --expires-at)",
+      type: "string",
+    },
+    verify: {
+      default: false,
+      description:
+        "Verify contract on block explorer (only used with --deploy)",
+      type: "boolean",
     },
   })
   .check((argv) => {
@@ -126,6 +139,12 @@ const parser = yargs(hideBin(process.argv))
     return true;
   });
 
+type DeploymentOutput = {
+  implementationAddress: string;
+  proxyAddress: string;
+  chainId: number;
+};
+
 /**
  * Deploys the PythLazer contract using forge script
  * @param chain - The EVM chain to deploy to
@@ -139,18 +158,37 @@ async function deployPythLazerContract(
   privateKey: string,
   verify: boolean,
   etherscanApiKey?: string,
+  gasLimit?: number,
 ): Promise<string> {
-  const lazerContractsDir = path.resolve("../../lazer/contracts/evm");
+  // Resolve path relative to this script's location, not CWD
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const lazerContractsDir = path.resolve(
+    scriptDir,
+    "../../lazer/contracts/evm",
+  );
+  const deploymentOutputPath = path.join(
+    lazerContractsDir,
+    "deployment-output.json",
+  );
   const rpcUrl = chain.rpcUrl;
 
   console.log(`Deploying PythLazer contract to ${chain.getId()}...`);
   console.log(`RPC URL: ${rpcUrl}`);
+
+  // Clean up any previous deployment output
+  if (existsSync(deploymentOutputPath)) {
+    unlinkSync(deploymentOutputPath);
+  }
 
   // Build forge command
   let forgeCommand = `forge script script/PythLazerDeploy.s.sol --rpc-url ${rpcUrl} --private-key ${privateKey} --broadcast`;
 
   if (verify && etherscanApiKey) {
     forgeCommand += ` --verify --etherscan-api-key ${etherscanApiKey}`;
+  }
+
+  if (gasLimit) {
+    forgeCommand += ` --skip-simulation --gas-limit ${gasLimit}`;
   }
 
   try {
@@ -162,19 +200,37 @@ async function deployPythLazerContract(
       stdio: "pipe",
     });
 
-    console.log("Deployment output:");
     console.log(output);
 
-    // Extract proxy address from output
-    const proxyMatch = /Deployed proxy to: (0x[a-fA-F0-9]{40})/.exec(output);
-    if (!proxyMatch) {
-      throw new Error("Could not extract proxy address from deployment output");
+    // Read deployment output from JSON file written by the forge script
+    if (!existsSync(deploymentOutputPath)) {
+      throw new Error(
+        "Deployment output file not found. Deployment may have failed.",
+      );
     }
 
-    const proxyAddress = proxyMatch[1];
-    console.log(`\nPythLazer proxy deployed at: ${proxyAddress}`);
+    const deploymentOutput = JSON.parse(
+      readFileSync(deploymentOutputPath, "utf8"),
+    ) as DeploymentOutput;
 
-    return proxyAddress ?? "";
+    // Verify chain ID matches
+    if (deploymentOutput.chainId !== chain.networkId) {
+      throw new Error(
+        `Chain ID mismatch: expected ${chain.networkId}, got ${deploymentOutput.chainId}`,
+      );
+    }
+
+    console.log(
+      `\nPythLazer implementation deployed at: ${deploymentOutput.implementationAddress}`,
+    );
+    console.log(
+      `PythLazer proxy deployed at: ${deploymentOutput.proxyAddress}`,
+    );
+
+    // Clean up the output file
+    unlinkSync(deploymentOutputPath);
+
+    return deploymentOutput.proxyAddress;
   } catch (error) {
     console.error("Deployment failed:", error);
     throw error;
@@ -224,9 +280,15 @@ async function updateTrustedSigner(
   trustedSigner: string,
   expiresAt: number,
   privateKey: PrivateKey,
+  rawTx: boolean,
 ): Promise<void> {
   const contract = getOrCreateLazerContract(chain, contractAddress);
-  await contract.updateTrustedSigner(trustedSigner, expiresAt, privateKey);
+  await contract.updateTrustedSigner(
+    trustedSigner,
+    expiresAt,
+    privateKey,
+    rawTx,
+  );
 }
 
 function findLazerContract(chain: EvmChain): EvmLazerContract | undefined {
@@ -249,6 +311,7 @@ export async function findOrDeployPythLazerContract(
   privateKey: string,
   verify: boolean,
   etherscanApiKey?: string,
+  gasLimit?: number,
 ): Promise<string> {
   const lazerContract = findLazerContract(chain);
   if (lazerContract) {
@@ -262,6 +325,7 @@ export async function findOrDeployPythLazerContract(
     privateKey,
     verify,
     etherscanApiKey,
+    gasLimit,
   );
   console.log(
     `✅ PythLazer contract deployed successfully at ${deployedAddress}`,
@@ -291,6 +355,7 @@ export async function main() {
         argv["private-key"],
         argv.verify,
         argv["etherscan-api-key"],
+        argv["gas-limit"],
       );
     }
 
@@ -326,6 +391,7 @@ export async function main() {
         argv["update-signer"],
         argv["expires-at"],
         toPrivateKey(argv["private-key"]),
+        argv["raw-tx"],
       );
 
       console.log(`\n✅ Trusted signer updated successfully`);

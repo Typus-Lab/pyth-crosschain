@@ -8,6 +8,7 @@ import {
   Key,
   Lightning,
   CurrencyDollarSimple,
+  Robot,
 } from "@phosphor-icons/react/dist/ssr";
 
 import { Callout } from "fumadocs-ui/components/callout";
@@ -15,7 +16,7 @@ import { Callout } from "fumadocs-ui/components/callout";
 <Callout type="info">Pyth Pro was previously known as Pyth Lazer.</Callout>
 
 Pyth Pro delivers customizable, enterprise-grade price data directly from first-party publishers.
-Subscribers can configure their price feeds, update schedules, and usage rights for display or redistribution.
+Subscribers can configure their price feeds and update schedules.
 The service is delivered through standard APIs for seamless integration.
 
 <Cards>
@@ -24,20 +25,23 @@ The service is delivered through standard APIs for seamless integration.
     title="Get your access token"
     description="Request authenticated access credentials for Pyth Pro."
     href="/price-feeds/pro/acquire-access-token"
-    target="_blank"
   />
   <Card
     icon={<Lightning size={12.5} />}
     title="Subscribe to prices"
     description="Configure real-time Pyth Pro price delivery."
     href="/price-feeds/pro/subscribe-to-prices"
-    target="_blank"
   />
   <Card
     icon={<CurrencyDollarSimple size={12.5} />}
     title="Pricing"
     description="Review subscription tiers and usage-based pricing details."
     href="https://www.pyth.network/pricing"
-    target="_blank"
+  />
+  <Card
+    icon={<Robot size={12.5} />}
+    title="Use with AI assistants"
+    description="Connect Claude, Cursor, and other AI tools to Pyth market data via MCP."
+    href="/price-feeds/pro/mcp"
   />
 </Cards>

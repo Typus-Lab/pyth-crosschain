@@ -21,11 +21,12 @@ The websocket servers are available at:
 
 - `wss://pyth-lazer-0.dourolabs.app/v1/stream`
 - `wss://pyth-lazer-1.dourolabs.app/v1/stream`
+- `wss://pyth-lazer-2.dourolabs.app/v1/stream`
 
 <Callout type="warning" title="Redundancy Required">
   For redundancy and to avoid interruptions during deployments, you must connect
-  to **both endpoints**. During deployments, a single endpoint will briefly go
-  down, so maintaining open connections to both endpoints ensures continuous
+  to **all endpoints**. During deployments, a single endpoint will briefly go
+  down, so maintaining open connections to all endpoints ensures continuous
   service availability.
 </Callout>
 
@@ -33,9 +34,16 @@ The websocket servers are available at:
   <Step>
   ### 1. Acquire an access token
 
-Please fill out [this form](https://tally.so/r/3xG8E5) to get in touch with our authorized distribution partners (Pyth Data Distributors) and obtain an access token.
+Please fill out [this form](https://2fga8d.share-eu1.hsforms.com/2ftdPrASCTLCxtP5YMzAq_Q) to get in touch with our authorized distribution partners (Pyth Data Distributors) and obtain an access token.
 
 Use the access token to authenticate the websocket connection by passing it as an `Authorization{:bash}` header with the value `Bearer {token}{:bash}`.
+
+<Callout type="warning">
+  **Security Warning**: Never expose your access token in frontend applications
+  or client-side code. Access tokens should only be used in secure backend
+  environments. Exposing tokens in frontend code makes them publicly accessible
+  and is a violation of our terms of service.
+</Callout>
 
   </Step>
   <Step>
@@ -50,8 +58,8 @@ client.send({
   type: "subscribe",
   subscriptionId: 1,
   priceFeedIds: [1, 2],
-  properties: ["price"],
-  chains: ["solana"],
+  properties: ["price", "feedUpdateTimestamp"],
+  formats: ["solana"],
   channel: "fixed_rate@200ms",
 });
 ```
@@ -61,8 +69,20 @@ The most significant parameters are:
 - `subscriptionId` is an arbitrary numeric identifier for a subscription. It will be returned back in response by the server. It does not affect the signed payload.
 - `priceFeedIds` is the list of price feeds to receive price data for. It will also include the verified payloads for the price feeds. Refer to the [Price Feed IDs list](/price-feeds/pro/price-feed-ids) for the supported price feeds.
 - `properties` is the list of properties to retrieve, such as **price**, **bestBidPrice**, **bestAskPrice**, etc.
-- `chains` is the list of chains to receive a signed payload for, such as **evm**, **solana**, etc.
+
+<Callout type="info" title="Recommended: Include feedUpdateTimestamp">
+  For production applications, include `"feedUpdateTimestamp"` in your
+  `properties` array. This field lets you determine whether a price was freshly
+  generated or carried forward from an earlier update. Compare it against
+  `timestampUs` to assess price freshness. See [Payload Reference — Price
+  Availability
+  Semantics](/price-feeds/pro/payload-reference#core-price-properties) for
+  details.
+</Callout>
+
+- `formats`(formerly known as `chains`) specifies the binary encoding format for the payload. This field is mandatory, but can be set to an empty array (e.g., `formats: []`) if no binary payload is needed. Use **evm** or **solana** to receive a signed payload for onchain verification, or **leUnsigned** for offchain-only use without signatures. See [Binary Formats & Signature Schemes](/price-feeds/pro/payload-reference#binary-formats--signature-schemes) for all options.
 - `channel` determines the update rate: updates in the **real_time** channel are sent as frequently as possible, while **fixed_rate@200ms** and **fixed_rate@50ms** channels are updated at fixed rates.
+- `ignoreInvalidFeeds` (optional, default: `false`) — if `true`, the subscription will ignore invalid feed IDs and subscribe to any valid feeds. The response will include details about which feeds were ignored and why. If all feeds are invalid, the subscription will still fail with a `subscriptionError`. See [Error Codes](/price-feeds/pro/error-codes) for the response format.
 
 There are also a few other configuration parameters -- see the [API documentation](https://pyth-lazer.dourolabs.app/docs) for more details.
 
@@ -79,14 +99,14 @@ Determine the most suitable values for your application -- they will be used in 
 
 To subscribe to the prices, send a request to the websocket server. The server will respond with a signed payload.
 
-1. Pyth Lazer provides an [SDK](https://github.com/pyth-network/pyth-crosschain/tree/main/lazer/sdk/js) to seamlessly integrate the websocket API into your application.
+1. Pyth Lazer provides an [SDK](https://www.npmjs.com/package/@pythnetwork/pyth-lazer-sdk) to seamlessly integrate the websocket API into your application.
    Install it using the following command:
 
 ```bash copy
 npm install --save @pythnetwork/pyth-lazer-sdk
 ```
 
-2. Then create a [`PythLazerClient`](https://github.com/pyth-network/pyth-crosschain/blob/main/lazer/sdk/js/src/client.ts#L51) object using both endpoint URLs and the access token requested from our authorized distribution partners (Pyth Data Distributors) in the first step:
+2. Then create a `PythLazerClient` object using both endpoint URLs and the access token requested from our authorized distribution partners (Pyth Data Distributors) in the first step:
 
 ```js copy
 import { PythLazerClient } from "@pythnetwork/pyth-lazer-sdk";
@@ -95,6 +115,7 @@ const client = await PythLazerClient.create(
   [
     "wss://pyth-lazer-0.dourolabs.app/v1/stream",
     "wss://pyth-lazer-1.dourolabs.app/v1/stream",
+    "wss://pyth-lazer-2.dourolabs.app/v1/stream",
   ],
   "YOUR_ACCESS_TOKEN",
 );
@@ -107,8 +128,8 @@ client.subscribe({
   type: "subscribe",
   subscriptionId: 1,
   priceFeedIds: [1, 2],
-  properties: ["price"],
-  chains: ["solana"],
+  properties: ["price", "feedUpdateTimestamp"],
+  formats: ["solana"],
   channel: "fixed_rate@200ms",
 });
 ```
@@ -132,11 +153,13 @@ By default, verified payloads contain the `parsed` field that one can use to eas
     "priceFeeds": [
       {
         "priceFeedId": 1,
-        "price": "1006900000000"
+        "price": "1006900000000",
+        "feedUpdateTimestamp": 1730986152400000
       },
       {
         "priceFeedId": 2,
-        "price": "2006900000000"
+        "price": "2006900000000",
+        "feedUpdateTimestamp": 1730986152400000
       }
     ]
   },

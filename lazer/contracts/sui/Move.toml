@@ -1,11 +1,11 @@
 [package]
 name = "pyth_lazer"
 version = "0.0.0"
-edition = "2024.beta"
+edition = "2024"
 
-[addresses]
-pyth_lazer = "0x0"
-
-[dev-dependencies]
-
-[dev-addresses]
+# TODO: Waiting for upstream PR, change to `wormhole-foundation:main` once it's
+# merged: https://github.com/wormhole-foundation/wormhole/pull/4639
+[dependencies.wormhole]
+git = "https://github.com/pyth-network/wormhole.git"
+subdir = "sui/wormhole"
+rev = "sui-package-update"

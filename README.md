@@ -10,6 +10,7 @@ Within this monorepo you will find the following subprojects:
 - [Target Chains](#target-chains)
 - [Hermes](#hermes)
 - [Fortuna](#fortuna)
+- [Pyth Lazer Pusher](#pyth-lazer-pusher)
 - [Local Development](#local-development)
   - [Setup](#setup)
   - [Pull requests](#pull-requests)
@@ -49,6 +50,12 @@ and [examples](https://github.com/pyth-network/pyth-examples/tree/main/price_fee
 > [fortuna](./apps/fortuna/)
 
 Fortuna is an off-chain service which can be used by [Entropy](https://pyth.network/entropy) providers.
+
+## Pyth Lazer Pusher
+
+> [pyth-lazer-pusher](./apps/pyth-lazer-pusher/)
+
+Price feed pushers that deliver Pyth Lazer data to external systems. Currently supports pushing to Bulk Trade validators.
 
 ## Local Development
 
@@ -143,8 +150,8 @@ To quickly get started, from the root of this repo, you can run the following:
 2. Answer the prompts
 3. Once the script is done, you will have your new webb app, library or CLI tool bootstrapped with all the current best practices.
 
-If you'd like to read more about the best practices, checkout this Notion page:
-[https://www.notion.so/dourolabs/Creating-a-new-JavaScript-TypeScript-Package-2a33e0276d9380c2b249cad18bb48919](🔗 Creating a new JavaScript / TypeScript Package)
+If you'd like to read more about the best practices, checkout this best practices doc:
+[🔗 Creating a new JavaScript / TypeScript Package](./doc/js-code-guidelines.md)
 
 ## Audit / Feature Status
 

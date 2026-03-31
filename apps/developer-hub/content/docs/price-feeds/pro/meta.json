@@ -5,13 +5,24 @@
     "acquire-access-token",
     "subscribe-to-prices",
     "integrate-as-consumer",
-    "integrate-as-publisher",
-    "---Reference Material---",
-    "price-feed-ids",
+    "mcp",
+    "mcp-skills",
+
+    "---Resources---",
+    "api",
     "payload-reference",
-    "[Websocket API Reference ↗](https://pyth-lazer.dourolabs.app/docs)",
-    "[Example Applications ↗](https://github.com/pyth-network/pyth-examples/tree/main/lazer)",
+    "rate-limits",
+    "error-codes",
+    "faq",
+    "price-feed-ids",
+    "contract-addresses",
+    "market-hours",
+    "futures-terminology",
+    "external:[HIP-3 as a Service](https://docs.pyth.network/price-feeds/hip-3-service)",
+    "external:[Symbols List API](https://pyth.dourolabs.app/v1/symbols)",
+    "external:[Example Applications](https://github.com/pyth-network/pyth-examples/tree/main/lazer)",
     "---Understanding Pyth Pro---",
-    "how-lazer-works"
+    "how-lazer-works",
+    "understanding-price-data"
   ]
 }

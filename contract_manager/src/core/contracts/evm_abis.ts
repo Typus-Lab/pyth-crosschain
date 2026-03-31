@@ -72,6 +72,19 @@ export const EXTENDED_ENTROPY_ABI = [
     stateMutability: "nonpayable",
     type: "function",
   },
+  {
+    inputs: [
+      {
+        internalType: "uint128",
+        name: "newPythFee",
+        type: "uint128",
+      },
+    ],
+    name: "setPythFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   ...OWNABLE_ABI,
   ...EntropyAbi,
 ] as any; // eslint-disable-line  @typescript-eslint/no-explicit-any
@@ -1435,6 +1448,19 @@ export const LAZER_ABI = [
         internalType: "address",
       },
       { name: "expiresAt", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "upgradeTo",
+    inputs: [
+      {
+        name: "newImplementation",
+        type: "address",
+        internalType: "address",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",

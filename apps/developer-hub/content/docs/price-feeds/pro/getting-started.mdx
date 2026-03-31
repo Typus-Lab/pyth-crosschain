@@ -14,10 +14,10 @@ This guide will walk you through setting up and running a basic JavaScript examp
 
 Before getting started, make sure you have the following installed:
 
+- A **Pyth Pro Access Token** - see [How to Acquire an Access Token](./acquire-access-token) if you don't have one
 - **Node.js** (version 18 or higher)
 - **pnpm** package manager
 - **Git** for cloning the examples repository
-- A **Pyth Pro Access Token** - see [How to Acquire an Access Token](./acquire-access-token) if you don't have one
 
 <Steps>
   <Step>
@@ -117,6 +117,7 @@ const client = await PythLazerClient.create({
   urls: [
     "wss://pyth-lazer-0.dourolabs.app/v1/stream",
     "wss://pyth-lazer-1.dourolabs.app/v1/stream",
+    "wss://pyth-lazer-2.dourolabs.app/v1/stream",
   ],
   token: process.env.ACCESS_TOKEN!,
 });
@@ -140,7 +141,20 @@ client.subscribe({
 });
 ```
 
-NOTE: Every property passed to `client.subscribe` are explained in the [API Reference](https://pyth-lazer.dourolabs.app/docs).
+<Callout type="info" title="Production Tip: Include feedUpdateTimestamp">
+  For production applications, add `"feedUpdateTimestamp"` to the `properties`
+  array. This field lets you determine whether a price was freshly generated or
+  carried forward from an earlier update by comparing it against `timestampUs`.
+  See [Payload Reference — Price Availability
+  Semantics](/price-feeds/pro/payload-reference#core-price-properties) for
+  details.
+</Callout>
+
+<Callout type="info">
+  For a detailed explanation of every property passed to `client.subscribe`, see
+  the [Payload
+  Reference](/price-feeds/pro/payload-reference#stream-response-structure).
+</Callout>
 
   </Step>
 </Steps>
@@ -162,6 +176,13 @@ Learn how to integrate Pyth Pro price feeds into your smart contracts:
 
 - **[Solana Integration](./integrate-as-consumer/svm)** - Build SVM smart contracts that consume Pyth Pro price feeds with cryptographic verification
 - **[EVM Integration](./integrate-as-consumer/evm)** - Integrate Pyth Pro into Ethereum and other EVM-compatible chains
+
+### AI-Assisted Development
+
+Use Pyth market data directly in AI assistants like Claude, Cursor, and Windsurf via the Model Context Protocol:
+
+- **[MCP Server](./mcp)** - Connect your AI assistant to Pyth price feeds, historical data, and candlestick charts
+- **[MCP Skills](./mcp-skills)** - Pre-built workflows for portfolio tracking, volatility analysis, FX conversion, and more
 
 ### Example Applications
 

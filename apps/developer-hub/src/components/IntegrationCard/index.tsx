@@ -20,8 +20,9 @@ export function IntegrationCard({
   description,
   colorScheme = "blue",
   external,
-  showArrow = true,
+  showArrow,
 }: IntegrationCardProps) {
+  const shouldShowArrow = showArrow ?? !external;
   const commonProps = {
     href,
     className: clsx(styles.card, "group"),
@@ -35,7 +36,7 @@ export function IntegrationCard({
           <div className={clsx(styles.icon, styles[colorScheme])}>{icon}</div>
         </div>
         <h3 className={clsx(styles.title, styles[colorScheme])}>{title}</h3>
-        {showArrow && (
+        {shouldShowArrow && (
           <span className={styles.arrow} aria-hidden="true">
             →
           </span>
@@ -45,11 +46,12 @@ export function IntegrationCard({
     </>
   );
 
-  return external ? (
-    <a {...commonProps} target="_blank" rel="noopener noreferrer">
+  return (
+    <Link
+      {...commonProps}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+    >
       {content}
-    </a>
-  ) : (
-    <Link {...commonProps}>{content}</Link>
+    </Link>
   );
 }
