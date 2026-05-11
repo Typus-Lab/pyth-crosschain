@@ -2,10 +2,7 @@
 name = "pyth_lazer"
 version = "0.0.0"
 edition = "2024"
+published-at = "0xfa65b0da732c85c34bda6504e367d6a800f1816798573268dd0931653bb8e375"
 
-# TODO: Waiting for upstream PR, change to `wormhole-foundation:main` once it's
-# merged: https://github.com/wormhole-foundation/wormhole/pull/4639
 [dependencies.wormhole]
-git = "https://github.com/Typus-Lab/wormhole.git"
-subdir = "sui/wormhole"
-rev = "sui/mainnet"
+local = "../../../target_chains/sui/vendor/wormhole_lazer/wormhole"

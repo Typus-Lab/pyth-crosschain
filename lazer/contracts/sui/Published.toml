@@ -3,11 +3,13 @@
 # This file SHOULD be committed to source control
 
 [published.mainnet]
+chain-id = "35834a8a"
 published-at = "0x7b502c8a7bcb3915892347f11086745570e759fe9708d03c03accf4c90bbf580"
 original-id = "0x7b502c8a7bcb3915892347f11086745570e759fe9708d03c03accf4c90bbf580"
 version = 1
 
 [published.testnet]
+chain-id = "4c78adac"
 published-at = "0xfa65b0da732c85c34bda6504e367d6a800f1816798573268dd0931653bb8e375"
 original-id = "0xfa65b0da732c85c34bda6504e367d6a800f1816798573268dd0931653bb8e375"
 version = 1
