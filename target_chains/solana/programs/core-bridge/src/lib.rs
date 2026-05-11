@@ -1,12 +1,10 @@
-#![allow(clippy::result_large_err)]
+#![allow(clippy::result_large_err, unexpected_cfgs)]
 
 cfg_if::cfg_if! {
-    if #[cfg(feature = "localnet")] {
-        declare_id!("Bridge1p5gheXUvJ6jGWGeCsgPKgnE3YgdGKRVCMY9o");
-    } else if #[cfg(feature = "mainnet")] {
+    if #[cfg(feature = "lazer")] {
+        declare_id!("HDw2E7P8X1SkCyjvoGsfBGAVUutKcj874bXjHrpVYrVL");
+    } else {
         declare_id!("HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ");
-    } else if #[cfg(feature = "testnet")] {
-        declare_id!("3u8hJUVTA4jH1wYAyUur7FFZVQ8H635K3tSHHF4ssjQ5");
     }
 }
 
@@ -123,9 +121,9 @@ pub mod wormhole_core_bridge_solana {
     }
 
     /// Process legacy Core Bridge instructions. See [legacy](crate::legacy) for more info.
-    pub fn process_legacy_instruction(
+    pub fn process_legacy_instruction<'info>(
         program_id: &Pubkey,
-        account_infos: &[AccountInfo],
+        account_infos: &'info [AccountInfo<'info>],
         ix_data: &[u8],
     ) -> Result<()> {
         legacy::process_legacy_instruction(program_id, account_infos, ix_data)
