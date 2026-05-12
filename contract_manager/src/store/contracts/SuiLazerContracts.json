@@ -7,8 +7,8 @@
   },
   {
     "chain": "sui_testnet",
-    "stateId": "0x5522303e37d67d6e1f41ce71ccf8e4efe21e7fa36f9bf18007a1a81ad63061d1",
-    "wormholeStateId": "0x750da8e6d16b6a363a39fe2eaa8295ac224a1e6fce4e47b58845e2e8746164f0",
+    "stateId": "0x958d14d055316eb124e1ab4ea1126b0bbb3907cb169ea57a71c2d1e0f50bad12",
+    "wormholeStateId": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",
     "type": "SuiLazerContract"
   }
 ]

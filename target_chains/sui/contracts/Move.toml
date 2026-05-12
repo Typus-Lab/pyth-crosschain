@@ -1,11 +1,12 @@
 [package]
 name = "Pyth"
 version = "0.0.2"
-published-at = "0xd1ac23e1582080e2e5d43dbad1cf463ea2337cdbbb1a9ca669e470cefb74d8fd"
+published-at = "0xabf837e98c26087cba0883c0a7a28326b1fa3c5e1e2c5abdb486f9e8f594c837"
 
 [dependencies.Wormhole]
-local = "../vendor/wormhole_lazer/wormhole"
+git = "https://github.com/Typus-Lab/wormhole.git"
+subdir = "sui/wormhole"
+rev = "testnet"
 
 [addresses]
-pyth = "0xd1ac23e1582080e2e5d43dbad1cf463ea2337cdbbb1a9ca669e470cefb74d8fd"
-wormhole = "0xe79f4e3e02ce132f40f39e73220493a802329d3cb6ad7f789e98a78910fc0053"
+pyth = "0xabf837e98c26087cba0883c0a7a28326b1fa3c5e1e2c5abdb486f9e8f594c837"
