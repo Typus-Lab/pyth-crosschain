@@ -10,6 +10,6 @@ version = 1
 
 [published.testnet]
 chain-id = "4c78adac"
-published-at = "0xfa65b0da732c85c34bda6504e367d6a800f1816798573268dd0931653bb8e375"
-original-id = "0xfa65b0da732c85c34bda6504e367d6a800f1816798573268dd0931653bb8e375"
+published-at = "0x3b4d58cacd16a46f90a327127c5a2f3753ebc18a0fb2a6d4b8936be2280f68da"
+original-id = "0x3b4d58cacd16a46f90a327127c5a2f3753ebc18a0fb2a6d4b8936be2280f68da"
 version = 1

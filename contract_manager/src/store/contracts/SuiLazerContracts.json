@@ -4,5 +4,11 @@
     "stateId": "0xd0db9c1e9212a98120384bf78d8b8c985d87b9ee6921dffcf9d1394062911573",
     "wormholeStateId": "aeab97f96cf9877fee2883315d459552b2b921edc16d7ceac6eab944dd88919c",
     "type": "SuiLazerContract"
+  },
+  {
+    "chain": "sui_testnet",
+    "stateId": "0x5522303e37d67d6e1f41ce71ccf8e4efe21e7fa36f9bf18007a1a81ad63061d1",
+    "wormholeStateId": "0x750da8e6d16b6a363a39fe2eaa8295ac224a1e6fce4e47b58845e2e8746164f0",
+    "type": "SuiLazerContract"
   }
 ]
