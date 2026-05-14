@@ -7,12 +7,6 @@
   },
   {
     "chain": "sui_testnet",
-    "stateId": "0x958d14d055316eb124e1ab4ea1126b0bbb3907cb169ea57a71c2d1e0f50bad12",
-    "wormholeStateId": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",
-    "type": "SuiLazerContract"
-  },
-  {
-    "chain": "sui_testnet",
     "stateId": "0x7b570126bfdcc7f7b2b4028445d4ac1d35c41da498606a2b097c3973425698d3",
     "wormholeStateId": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",
     "type": "SuiLazerContract"
