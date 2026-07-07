@@ -2,10 +2,12 @@
 name = "pyth_lazer"
 version = "0.0.0"
 edition = "2024"
+published-at = "0x7b502c8a7bcb3915892347f11086745570e759fe9708d03c03accf4c90bbf580"
 
-# TODO: Waiting for upstream PR, change to `wormhole-foundation:main` once it's
-# merged: https://github.com/wormhole-foundation/wormhole/pull/4639
+# Same Typus-Lab wormhole rev as the sibling target_chains Pyth dep so a
+# consumer's dependency graph resolves a single wormhole package (mirrors the
+# testnet branch, which pins Typus-Lab/wormhole rev = "testnet").
 [dependencies.wormhole]
-git = "https://github.com/pyth-network/wormhole.git"
+git = "https://github.com/Typus-Lab/wormhole.git"
 subdir = "sui/wormhole"
-rev = "sui-package-update"
+rev = "sui/mainnet"
